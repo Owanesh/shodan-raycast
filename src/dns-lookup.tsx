@@ -1,7 +1,22 @@
 import { useState, useMemo } from "react";
-import { List, ActionPanel, Action, Icon, Form, showToast, Toast, getPreferenceValues, Color } from "@raycast/api";
+import {
+  List,
+  ActionPanel,
+  Action,
+  Icon,
+  Form,
+  showToast,
+  Toast,
+  getPreferenceValues,
+  Color,
+} from "@raycast/api";
 import { useFetch } from "@raycast/utils";
-import { Preferences, DnsResolveResponse, DnsReverseResponse, ShodanDomainInfo } from "./api/types";
+import {
+  Preferences,
+  DnsResolveResponse,
+  DnsReverseResponse,
+  ShodanDomainInfo,
+} from "./api/types";
 
 type LookupMode = "resolve" | "reverse" | "domain" | "subdomains";
 
@@ -13,37 +28,54 @@ export default function DnsLookupCommand() {
   const { apiKey } = getPreferenceValues<Preferences>();
 
   // DNS Resolve (hostname to IP)
-  const { data: resolveData, isLoading: resolveLoading } = useFetch<DnsResolveResponse>(
-    `https://api.shodan.io/dns/resolve?hostnames=${encodeURIComponent(submittedInput)}&key=${apiKey}`,
-    {
-      execute: mode === "resolve" && submittedInput.length > 0,
-      onError: (err) => {
-        showToast({ style: Toast.Style.Failure, title: "DNS Resolve Failed", message: err.message });
+  const { data: resolveData, isLoading: resolveLoading } =
+    useFetch<DnsResolveResponse>(
+      `https://api.shodan.io/dns/resolve?hostnames=${encodeURIComponent(submittedInput)}&key=${apiKey}`,
+      {
+        execute: mode === "resolve" && submittedInput.length > 0,
+        onError: (err) => {
+          showToast({
+            style: Toast.Style.Failure,
+            title: "DNS Resolve Failed",
+            message: err.message,
+          });
+        },
       },
-    },
-  );
+    );
 
   // DNS Reverse (IP to hostname)
-  const { data: reverseData, isLoading: reverseLoading } = useFetch<DnsReverseResponse>(
-    `https://api.shodan.io/dns/reverse?ips=${encodeURIComponent(submittedInput)}&key=${apiKey}`,
-    {
-      execute: mode === "reverse" && submittedInput.length > 0,
-      onError: (err) => {
-        showToast({ style: Toast.Style.Failure, title: "Reverse DNS Failed", message: err.message });
+  const { data: reverseData, isLoading: reverseLoading } =
+    useFetch<DnsReverseResponse>(
+      `https://api.shodan.io/dns/reverse?ips=${encodeURIComponent(submittedInput)}&key=${apiKey}`,
+      {
+        execute: mode === "reverse" && submittedInput.length > 0,
+        onError: (err) => {
+          showToast({
+            style: Toast.Style.Failure,
+            title: "Reverse DNS Failed",
+            message: err.message,
+          });
+        },
       },
-    },
-  );
+    );
 
   // Domain info (includes subdomains)
-  const { data: domainData, isLoading: domainLoading } = useFetch<ShodanDomainInfo>(
-    `https://api.shodan.io/dns/domain/${encodeURIComponent(submittedInput)}?key=${apiKey}`,
-    {
-      execute: (mode === "domain" || mode === "subdomains") && submittedInput.length > 0,
-      onError: (err) => {
-        showToast({ style: Toast.Style.Failure, title: "Domain Lookup Failed", message: err.message });
+  const { data: domainData, isLoading: domainLoading } =
+    useFetch<ShodanDomainInfo>(
+      `https://api.shodan.io/dns/domain/${encodeURIComponent(submittedInput)}?key=${apiKey}`,
+      {
+        execute:
+          (mode === "domain" || mode === "subdomains") &&
+          submittedInput.length > 0,
+        onError: (err) => {
+          showToast({
+            style: Toast.Style.Failure,
+            title: "Domain Lookup Failed",
+            message: err.message,
+          });
+        },
       },
-    },
-  );
+    );
 
   const isLoading = resolveLoading || reverseLoading || domainLoading;
 
@@ -89,15 +121,40 @@ export default function DnsLookupCommand() {
         navigationTitle="DNS Lookup"
         actions={
           <ActionPanel>
-            <Action.SubmitForm title="Look up" onSubmit={handleSubmit} icon={Icon.MagnifyingGlass} />
+            <Action.SubmitForm
+              title="Look up"
+              onSubmit={handleSubmit}
+              icon={Icon.MagnifyingGlass}
+            />
           </ActionPanel>
         }
       >
-        <Form.Dropdown id="mode" title="Lookup Type" value={mode} onChange={(v) => setMode(v as LookupMode)}>
-          <Form.Dropdown.Item value="domain" title="Domain Info & DNS Records" icon={Icon.Document} />
-          <Form.Dropdown.Item value="subdomains" title="Subdomain Enumeration (Zone Crawl)" icon={Icon.List} />
-          <Form.Dropdown.Item value="resolve" title="Resolve Hostname to IP" icon={Icon.Globe} />
-          <Form.Dropdown.Item value="reverse" title="Reverse DNS (IP to Hostname)" icon={Icon.ArrowClockwise} />
+        <Form.Dropdown
+          id="mode"
+          title="Lookup Type"
+          value={mode}
+          onChange={(v) => setMode(v as LookupMode)}
+        >
+          <Form.Dropdown.Item
+            value="domain"
+            title="Domain Info & DNS Records"
+            icon={Icon.Document}
+          />
+          <Form.Dropdown.Item
+            value="subdomains"
+            title="Subdomain Enumeration (Zone Crawl)"
+            icon={Icon.List}
+          />
+          <Form.Dropdown.Item
+            value="resolve"
+            title="Resolve Hostname to IP"
+            icon={Icon.Globe}
+          />
+          <Form.Dropdown.Item
+            value="reverse"
+            title="Reverse DNS (IP to Hostname)"
+            icon={Icon.ArrowClockwise}
+          />
         </Form.Dropdown>
 
         <Form.TextField
@@ -134,8 +191,14 @@ export default function DnsLookupCommand() {
   return (
     <List
       isLoading={isLoading}
-      navigationTitle={mode === "subdomains" ? `Subdomains: ${submittedInput}` : `DNS: ${submittedInput}`}
-      searchBarPlaceholder={mode === "subdomains" ? "Filter subdomains..." : "Filter results..."}
+      navigationTitle={
+        mode === "subdomains"
+          ? `Subdomains: ${submittedInput}`
+          : `DNS: ${submittedInput}`
+      }
+      searchBarPlaceholder={
+        mode === "subdomains" ? "Filter subdomains..." : "Filter results..."
+      }
       onSearchTextChange={setFilterQuery}
       filtering={false}
     >
@@ -147,13 +210,29 @@ export default function DnsLookupCommand() {
               key={hostname}
               title={hostname}
               subtitle={ip || "No resolution"}
-              icon={{ source: Icon.Globe, tintColor: ip ? Color.Green : Color.Red }}
-              accessories={ip ? [{ tag: "Resolved" }] : [{ tag: { value: "Failed", color: Color.Red } }]}
+              icon={{
+                source: Icon.Globe,
+                tintColor: ip ? Color.Green : Color.Red,
+              }}
+              accessories={
+                ip
+                  ? [{ tag: "Resolved" }]
+                  : [{ tag: { value: "Failed", color: Color.Red } }]
+              }
               actions={
                 <ActionPanel>
-                  {ip && <Action.CopyToClipboard title="Copy IP" content={ip} />}
-                  <Action.CopyToClipboard title="Copy Hostname" content={hostname} />
-                  <Action title="New Lookup" icon={Icon.MagnifyingGlass} onAction={handleNewLookup} />
+                  {ip && (
+                    <Action.CopyToClipboard title="Copy IP" content={ip} />
+                  )}
+                  <Action.CopyToClipboard
+                    title="Copy Hostname"
+                    content={hostname}
+                  />
+                  <Action
+                    title="New Lookup"
+                    icon={Icon.MagnifyingGlass}
+                    onAction={handleNewLookup}
+                  />
                 </ActionPanel>
               }
             />
@@ -168,14 +247,32 @@ export default function DnsLookupCommand() {
             <List.Item
               key={ip}
               title={ip}
-              subtitle={hostnames.length > 0 ? hostnames.join(", ") : "No hostnames found"}
-              icon={{ source: Icon.ArrowClockwise, tintColor: hostnames.length > 0 ? Color.Green : Color.Orange }}
-              accessories={[{ text: `${hostnames.length} hostname${hostnames.length !== 1 ? "s" : ""}` }]}
+              subtitle={
+                hostnames.length > 0
+                  ? hostnames.join(", ")
+                  : "No hostnames found"
+              }
+              icon={{
+                source: Icon.ArrowClockwise,
+                tintColor: hostnames.length > 0 ? Color.Green : Color.Orange,
+              }}
+              accessories={[
+                {
+                  text: `${hostnames.length} hostname${hostnames.length !== 1 ? "s" : ""}`,
+                },
+              ]}
               actions={
                 <ActionPanel>
-                  <Action.CopyToClipboard title="Copy Hostnames" content={hostnames.join(", ")} />
+                  <Action.CopyToClipboard
+                    title="Copy Hostnames"
+                    content={hostnames.join(", ")}
+                  />
                   <Action.CopyToClipboard title="Copy IP" content={ip} />
-                  <Action title="New Lookup" icon={Icon.MagnifyingGlass} onAction={handleNewLookup} />
+                  <Action
+                    title="New Lookup"
+                    icon={Icon.MagnifyingGlass}
+                    onAction={handleNewLookup}
+                  />
                 </ActionPanel>
               }
             />
@@ -197,7 +294,11 @@ export default function DnsLookupCommand() {
             {filteredSubdomains.length === 0 && (
               <List.Item
                 title="No subdomains found"
-                subtitle={filterQuery ? "Try a different filter" : "No subdomains in Shodan's database"}
+                subtitle={
+                  filterQuery
+                    ? "Try a different filter"
+                    : "No subdomains in Shodan's database"
+                }
                 icon={Icon.XMarkCircle}
               />
             )}
@@ -211,8 +312,14 @@ export default function DnsLookupCommand() {
                   icon={{ source: Icon.Link, tintColor: Color.Blue }}
                   actions={
                     <ActionPanel>
-                      <Action.CopyToClipboard title="Copy Subdomain" content={fullDomain} />
-                      <Action.OpenInBrowser title="Open in Browser" url={`https://${fullDomain}`} />
+                      <Action.CopyToClipboard
+                        title="Copy Subdomain"
+                        content={fullDomain}
+                      />
+                      <Action.OpenInBrowser
+                        title="Open in Browser"
+                        url={`https://${fullDomain}`}
+                      />
                       <Action.OpenInBrowser
                         title="Search on Shodan"
                         url={`https://www.shodan.io/search?query=hostname:${fullDomain}`}
@@ -222,12 +329,21 @@ export default function DnsLookupCommand() {
                         title="Copy All Subdomains"
                         icon={Icon.Clipboard}
                         onAction={async () => {
-                          const all = domainData.subdomains.map((s) => `${s}.${domainData.domain}`).join("\n");
+                          const all = domainData.subdomains
+                            .map((s) => `${s}.${domainData.domain}`)
+                            .join("\n");
                           await navigator.clipboard.writeText(all);
-                          await showToast({ style: Toast.Style.Success, title: "Copied All Subdomains" });
+                          await showToast({
+                            style: Toast.Style.Success,
+                            title: "Copied All Subdomains",
+                          });
                         }}
                       />
-                      <Action title="New Lookup" icon={Icon.MagnifyingGlass} onAction={handleNewLookup} />
+                      <Action
+                        title="New Lookup"
+                        icon={Icon.MagnifyingGlass}
+                        onAction={handleNewLookup}
+                      />
                     </ActionPanel>
                   }
                 />
@@ -258,8 +374,15 @@ export default function DnsLookupCommand() {
               icon={{ source: Icon.Globe, tintColor: Color.Blue }}
               actions={
                 <ActionPanel>
-                  <Action.CopyToClipboard title="Copy Domain" content={domainData.domain} />
-                  <Action title="New Lookup" icon={Icon.MagnifyingGlass} onAction={handleNewLookup} />
+                  <Action.CopyToClipboard
+                    title="Copy Domain"
+                    content={domainData.domain}
+                  />
+                  <Action
+                    title="New Lookup"
+                    icon={Icon.MagnifyingGlass}
+                    onAction={handleNewLookup}
+                  />
                 </ActionPanel>
               }
             />
@@ -284,9 +407,19 @@ export default function DnsLookupCommand() {
                   icon={Icon.Link}
                   actions={
                     <ActionPanel>
-                      <Action.CopyToClipboard title="Copy Subdomain" content={`${subdomain}.${domainData.domain}`} />
-                      <Action.OpenInBrowser title="Open in Browser" url={`https://${subdomain}.${domainData.domain}`} />
-                      <Action title="New Lookup" icon={Icon.MagnifyingGlass} onAction={handleNewLookup} />
+                      <Action.CopyToClipboard
+                        title="Copy Subdomain"
+                        content={`${subdomain}.${domainData.domain}`}
+                      />
+                      <Action.OpenInBrowser
+                        title="Open in Browser"
+                        url={`https://${subdomain}.${domainData.domain}`}
+                      />
+                      <Action
+                        title="New Lookup"
+                        icon={Icon.MagnifyingGlass}
+                        onAction={handleNewLookup}
+                      />
                     </ActionPanel>
                   }
                 />
@@ -299,7 +432,9 @@ export default function DnsLookupCommand() {
                     <ActionPanel>
                       <Action.CopyToClipboard
                         title="Copy All Subdomains"
-                        content={domainData.subdomains.map((s) => `${s}.${domainData.domain}`).join("\n")}
+                        content={domainData.subdomains
+                          .map((s) => `${s}.${domainData.domain}`)
+                          .join("\n")}
                       />
                     </ActionPanel>
                   }
@@ -318,15 +453,29 @@ export default function DnsLookupCommand() {
                   title={record.subdomain || "@"}
                   subtitle={record.value}
                   icon={Icon.Document}
-                  accessories={[{ tag: { value: record.type, color: getRecordTypeColor(record.type) } }]}
+                  accessories={[
+                    {
+                      tag: {
+                        value: record.type,
+                        color: getRecordTypeColor(record.type),
+                      },
+                    },
+                  ]}
                   actions={
                     <ActionPanel>
-                      <Action.CopyToClipboard title="Copy Value" content={record.value} />
+                      <Action.CopyToClipboard
+                        title="Copy Value"
+                        content={record.value}
+                      />
                       <Action.CopyToClipboard
                         title="Copy Full Record"
                         content={`${record.subdomain || "@"}.${domainData.domain} ${record.type} ${record.value}`}
                       />
-                      <Action title="New Lookup" icon={Icon.MagnifyingGlass} onAction={handleNewLookup} />
+                      <Action
+                        title="New Lookup"
+                        icon={Icon.MagnifyingGlass}
+                        onAction={handleNewLookup}
+                      />
                     </ActionPanel>
                   }
                 />

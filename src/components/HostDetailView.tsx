@@ -1,5 +1,13 @@
 import { useState, useEffect, useRef } from "react";
-import { Detail, ActionPanel, Action, Icon, Color, showToast, Toast } from "@raycast/api";
+import {
+  Detail,
+  ActionPanel,
+  Action,
+  Icon,
+  Color,
+  showToast,
+  Toast,
+} from "@raycast/api";
 import { ShodanHost, ShodanSearchMatch } from "../api/types";
 import { getPortColor } from "../utils/formatters";
 import { copyHostAsJSON } from "../utils/export";
@@ -84,7 +92,12 @@ const KNOWN_PORTS: Record<number, string> = {
 };
 
 // Format service info line with info icon for known ports
-function formatServiceLine(port: number, product?: string, version?: string, protocol?: string): string {
+function formatServiceLine(
+  port: number,
+  product?: string,
+  version?: string,
+  protocol?: string,
+): string {
   const knownService = KNOWN_PORTS[port];
   const hasKnown = !!knownService;
   const infoIcon = hasKnown ? " ℹ️" : "";
@@ -106,7 +119,11 @@ function formatServiceLine(port: number, product?: string, version?: string, pro
     line += ` — ${parts.join(" ")}`;
   }
 
-  if (hasKnown && product && product.toLowerCase() !== knownService.toLowerCase()) {
+  if (
+    hasKnown &&
+    product &&
+    product.toLowerCase() !== knownService.toLowerCase()
+  ) {
     line += `\n\n> *Known service: ${knownService}*`;
   }
 
@@ -126,7 +143,12 @@ function generateFullHostMarkdown(host: ShodanHost): string {
     const sortedServices = [...services].sort((a, b) => a.port - b.port);
 
     for (const service of sortedServices) {
-      md += formatServiceLine(service.port, service.product, service.version, service.protocol);
+      md += formatServiceLine(
+        service.port,
+        service.product,
+        service.version,
+        service.protocol,
+      );
       md += "\n\n";
 
       if (service.data && service.data.trim().length > 0) {
@@ -137,9 +159,12 @@ function generateFullHostMarkdown(host: ShodanHost): string {
 
       if (service.http) {
         const httpParts: string[] = [];
-        if (service.http.status) httpParts.push(`Status: ${service.http.status}`);
-        if (service.http.server) httpParts.push(`Server: ${service.http.server}`);
-        if (service.http.title) httpParts.push(`Title: "${service.http.title}"`);
+        if (service.http.status)
+          httpParts.push(`Status: ${service.http.status}`);
+        if (service.http.server)
+          httpParts.push(`Server: ${service.http.server}`);
+        if (service.http.title)
+          httpParts.push(`Title: "${service.http.title}"`);
         if (httpParts.length > 0) {
           md += `> ${httpParts.join(" · ")}\n\n`;
         }
@@ -148,7 +173,9 @@ function generateFullHostMarkdown(host: ShodanHost): string {
       if (service.ssl?.cert) {
         const cert = service.ssl.cert;
         const subject = cert.subject?.CN || cert.subject?.O || "Unknown";
-        const expires = cert.expires ? new Date(cert.expires).toLocaleDateString() : "Unknown";
+        const expires = cert.expires
+          ? new Date(cert.expires).toLocaleDateString()
+          : "Unknown";
         md += `> 🔒 SSL: ${subject} (expires: ${expires})\n\n`;
       }
 
@@ -179,7 +206,12 @@ function generatePartialMarkdown(match: ShodanSearchMatch): string {
   let md = "";
 
   md += `## Service (from search)\n\n`;
-  md += formatServiceLine(match.port, match.product, match.version, match.transport);
+  md += formatServiceLine(
+    match.port,
+    match.product,
+    match.version,
+    match.transport,
+  );
   md += "\n\n";
 
   if (match.data && match.data.trim().length > 0) {
@@ -201,7 +233,9 @@ function generatePartialMarkdown(match: ShodanSearchMatch): string {
   if (match.ssl?.cert) {
     const cert = match.ssl.cert;
     const subject = cert.subject?.CN || cert.subject?.O || "Unknown";
-    const expires = cert.expires ? new Date(cert.expires).toLocaleDateString() : "Unknown";
+    const expires = cert.expires
+      ? new Date(cert.expires).toLocaleDateString()
+      : "Unknown";
     md += `> 🔒 SSL: ${subject} (expires: ${expires})\n\n`;
   }
 
@@ -229,7 +263,11 @@ function generatePartialMarkdown(match: ShodanSearchMatch): string {
 export function HostDetailView({ ip, searchMatch }: HostDetailViewProps) {
   const [enableFullScan, setEnableFullScan] = useState(false);
   const isMounted = useRef(true);
-  const { host: fullHost, isLoading, error } = useShodanHost({ ip, enabled: enableFullScan });
+  const {
+    host: fullHost,
+    isLoading,
+    error,
+  } = useShodanHost({ ip, enabled: enableFullScan });
 
   // Cancel request on unmount
   useEffect(() => {
@@ -243,7 +281,10 @@ export function HostDetailView({ ip, searchMatch }: HostDetailViewProps) {
   const handleFullScan = () => {
     if (!isMounted.current) return;
     setEnableFullScan(true);
-    showToast({ style: Toast.Style.Animated, title: "Loading full host data..." });
+    showToast({
+      style: Toast.Style.Animated,
+      title: "Loading full host data...",
+    });
   };
 
   // Determine what data to show
@@ -254,8 +295,13 @@ export function HostDetailView({ ip, searchMatch }: HostDetailViewProps) {
   // Use full data if available, otherwise use search match data
   const location = host?.location || match?.location;
   const flag = countryCodeToFlag(location?.country_code);
-  const locationParts = [location?.city, location?.region_code, location?.country_name].filter(Boolean);
-  const locationText = locationParts.length > 0 ? locationParts.join(", ") : "Unknown";
+  const locationParts = [
+    location?.city,
+    location?.region_code,
+    location?.country_name,
+  ].filter(Boolean);
+  const locationText =
+    locationParts.length > 0 ? locationParts.join(", ") : "Unknown";
 
   const org = host?.org || match?.org;
   const asn = host?.asn || match?.asn;
@@ -265,7 +311,8 @@ export function HostDetailView({ ip, searchMatch }: HostDetailViewProps) {
 
   // Ports
   const ports = host ? host.ports : match ? [match.port] : [];
-  const vulnList = host?.vulns || (match?.vulns ? Object.keys(match.vulns) : []);
+  const vulnList =
+    host?.vulns || (match?.vulns ? Object.keys(match.vulns) : []);
 
   // Generate markdown
   let markdown = "";
@@ -288,13 +335,20 @@ export function HostDetailView({ ip, searchMatch }: HostDetailViewProps) {
       navigationTitle={ip}
       metadata={
         <Detail.Metadata>
-          <Detail.Metadata.Label title="IP Address" text={ip} icon={Icon.Globe} />
+          <Detail.Metadata.Label
+            title="IP Address"
+            text={ip}
+            icon={Icon.Globe}
+          />
 
           <Detail.Metadata.Separator />
 
           {location && (
             <>
-              <Detail.Metadata.Label title="Location" text={`${flag} ${locationText}`} />
+              <Detail.Metadata.Label
+                title="Location"
+                text={`${flag} ${locationText}`}
+              />
               {location.latitude && location.longitude && (
                 <Detail.Metadata.Label
                   title="Coordinates"
@@ -305,27 +359,43 @@ export function HostDetailView({ ip, searchMatch }: HostDetailViewProps) {
           )}
           {org && <Detail.Metadata.Label title="Organization" text={org} />}
           {asn && <Detail.Metadata.Label title="ASN" text={asn} />}
-          {isp && isp !== org && <Detail.Metadata.Label title="ISP" text={isp} />}
+          {isp && isp !== org && (
+            <Detail.Metadata.Label title="ISP" text={isp} />
+          )}
 
           <Detail.Metadata.Separator />
 
           {hostnames.length > 0 && (
             <Detail.Metadata.TagList title="Hostnames">
               {hostnames.slice(0, 5).map((hostname) => (
-                <Detail.Metadata.TagList.Item key={hostname} text={hostname} color={Color.Blue} />
+                <Detail.Metadata.TagList.Item
+                  key={hostname}
+                  text={hostname}
+                  color={Color.Blue}
+                />
               ))}
               {hostnames.length > 5 && (
-                <Detail.Metadata.TagList.Item text={`+${hostnames.length - 5}`} color={Color.SecondaryText} />
+                <Detail.Metadata.TagList.Item
+                  text={`+${hostnames.length - 5}`}
+                  color={Color.SecondaryText}
+                />
               )}
             </Detail.Metadata.TagList>
           )}
 
           <Detail.Metadata.TagList title={`Ports (${ports.length})`}>
             {ports.slice(0, 12).map((port) => (
-              <Detail.Metadata.TagList.Item key={port} text={`${port}`} color={getPortColor(port)} />
+              <Detail.Metadata.TagList.Item
+                key={port}
+                text={`${port}`}
+                color={getPortColor(port)}
+              />
             ))}
             {ports.length > 12 && (
-              <Detail.Metadata.TagList.Item text={`+${ports.length - 12}`} color={Color.SecondaryText} />
+              <Detail.Metadata.TagList.Item
+                text={`+${ports.length - 12}`}
+                color={Color.SecondaryText}
+              />
             )}
           </Detail.Metadata.TagList>
 
@@ -345,23 +415,46 @@ export function HostDetailView({ ip, searchMatch }: HostDetailViewProps) {
               <Detail.Metadata.Separator />
               <Detail.Metadata.TagList title="Tags">
                 {tags.map((tag) => (
-                  <Detail.Metadata.TagList.Item key={tag} text={tag} color={Color.Purple} />
+                  <Detail.Metadata.TagList.Item
+                    key={tag}
+                    text={tag}
+                    color={Color.Purple}
+                  />
                 ))}
               </Detail.Metadata.TagList>
             </>
           )}
 
           <Detail.Metadata.Separator />
-          <Detail.Metadata.Link title="Shodan" text="View Full Report" target={`https://www.shodan.io/host/${ip}`} />
+          <Detail.Metadata.Link
+            title="Shodan"
+            text="View Full Report"
+            target={`https://www.shodan.io/host/${ip}`}
+          />
         </Detail.Metadata>
       }
       actions={
         <ActionPanel>
-          {!hasFullData && !isLoading && <Action title="Full Scan" icon={Icon.Download} onAction={handleFullScan} />}
+          {!hasFullData && !isLoading && (
+            <Action
+              title="Full Scan"
+              icon={Icon.Download}
+              onAction={handleFullScan}
+            />
+          )}
 
           <ActionPanel.Section title="Copy">
-            <Action.CopyToClipboard title="Copy IP Address" content={ip} shortcut={{ modifiers: ["cmd"], key: "c" }} />
-            {ports.length > 0 && <Action.CopyToClipboard title="Copy All Ports" content={ports.join(", ")} />}
+            <Action.CopyToClipboard
+              title="Copy IP Address"
+              content={ip}
+              shortcut={{ modifiers: ["cmd"], key: "c" }}
+            />
+            {ports.length > 0 && (
+              <Action.CopyToClipboard
+                title="Copy All Ports"
+                content={ports.join(", ")}
+              />
+            )}
             {(host || match) && (
               <Action
                 title="Copy as JSON"
@@ -370,7 +463,12 @@ export function HostDetailView({ ip, searchMatch }: HostDetailViewProps) {
                 shortcut={{ modifiers: ["cmd", "shift"], key: "c" }}
               />
             )}
-            {hostnames.length > 0 && <Action.CopyToClipboard title="Copy Hostnames" content={hostnames.join("\n")} />}
+            {hostnames.length > 0 && (
+              <Action.CopyToClipboard
+                title="Copy Hostnames"
+                content={hostnames.join("\n")}
+              />
+            )}
           </ActionPanel.Section>
 
           <ActionPanel.Section title="Open">

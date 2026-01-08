@@ -1,14 +1,35 @@
 import { useState, useMemo, useEffect } from "react";
-import { List, ActionPanel, Action, Icon, Form, useNavigation, Alert, confirmAlert, Color } from "@raycast/api";
+import {
+  List,
+  ActionPanel,
+  Action,
+  Icon,
+  Form,
+  useNavigation,
+  Alert,
+  confirmAlert,
+  Color,
+} from "@raycast/api";
 import { useFavorites } from "./hooks/useFavorites";
 import { useShodanSearch } from "./hooks/useShodanSearch";
 import { HostDetailView } from "./components/HostDetailView";
-import { getPortColor, getServiceNameForPort, truncateString, formatTimestamp } from "./utils/formatters";
+import {
+  getPortColor,
+  getServiceNameForPort,
+  truncateString,
+  formatTimestamp,
+} from "./utils/formatters";
 import { copyAsJSON, copyAsCSV } from "./utils/export";
 import { filterResults } from "./utils/filter";
 import { FavoriteQuery } from "./api/types";
 
-function FavoriteResultsView({ favorite, onBack }: { favorite: FavoriteQuery; onBack: () => void }) {
+function FavoriteResultsView({
+  favorite,
+  onBack,
+}: {
+  favorite: FavoriteQuery;
+  onBack: () => void;
+}) {
   const { push } = useNavigation();
   const { recordUsage } = useFavorites();
   const [filterQuery, setFilterQuery] = useState("");
@@ -66,9 +87,12 @@ function FavoriteResultsView({ favorite, onBack }: { favorite: FavoriteQuery; on
           }
         >
           {displayResults.map((result, index) => {
-            const vulnCount = result.vulns ? Object.keys(result.vulns).length : 0;
+            const vulnCount = result.vulns
+              ? Object.keys(result.vulns).length
+              : 0;
             const subtitle = [
-              result.product && `${result.product}${result.version ? ` ${result.version}` : ""}`,
+              result.product &&
+                `${result.product}${result.version ? ` ${result.version}` : ""}`,
               result.org,
             ]
               .filter(Boolean)
@@ -105,7 +129,14 @@ function FavoriteResultsView({ favorite, onBack }: { favorite: FavoriteQuery; on
                     <Action
                       title="View Details"
                       icon={Icon.Eye}
-                      onAction={() => push(<HostDetailView ip={result.ip_str} searchMatch={result} />)}
+                      onAction={() =>
+                        push(
+                          <HostDetailView
+                            ip={result.ip_str}
+                            searchMatch={result}
+                          />,
+                        )
+                      }
                     />
                     <Action.CopyToClipboard
                       title="Copy IP"
@@ -115,15 +146,25 @@ function FavoriteResultsView({ favorite, onBack }: { favorite: FavoriteQuery; on
                     <Action
                       title="Copy as JSON"
                       icon={Icon.Clipboard}
-                      onAction={() => copyAsJSON(result, `Host ${result.ip_str}`)}
+                      onAction={() =>
+                        copyAsJSON(result, `Host ${result.ip_str}`)
+                      }
                     />
-                    <Action title="Go Back" icon={Icon.ArrowLeft} onAction={onBack} />
+                    <Action
+                      title="Go Back"
+                      icon={Icon.ArrowLeft}
+                      onAction={onBack}
+                    />
                     <Action
                       title="Export All as JSON"
                       icon={Icon.Download}
                       onAction={() => copyAsJSON(displayResults, "All results")}
                     />
-                    <Action title="Export All as Csv" icon={Icon.Download} onAction={() => copyAsCSV(displayResults)} />
+                    <Action
+                      title="Export All as Csv"
+                      icon={Icon.Download}
+                      onAction={() => copyAsCSV(displayResults)}
+                    />
                   </ActionPanel>
                 }
               />
@@ -137,11 +178,17 @@ function FavoriteResultsView({ favorite, onBack }: { favorite: FavoriteQuery; on
 
 export default function FavoritesCommand() {
   const { favorites, removeFavorite, renameFavorite } = useFavorites();
-  const [selectedFavorite, setSelectedFavorite] = useState<FavoriteQuery | null>(null);
+  const [selectedFavorite, setSelectedFavorite] =
+    useState<FavoriteQuery | null>(null);
   const { push, pop } = useNavigation();
 
   if (selectedFavorite) {
-    return <FavoriteResultsView favorite={selectedFavorite} onBack={() => setSelectedFavorite(null)} />;
+    return (
+      <FavoriteResultsView
+        favorite={selectedFavorite}
+        onBack={() => setSelectedFavorite(null)}
+      />
+    );
   }
 
   if (favorites.length === 0) {
@@ -204,7 +251,10 @@ export default function FavoritesCommand() {
 
   return (
     <List searchBarPlaceholder="Search favorites...">
-      <List.Section title="Favorite Queries" subtitle={`${favorites.length} saved`}>
+      <List.Section
+        title="Favorite Queries"
+        subtitle={`${favorites.length} saved`}
+      >
         {sortedFavorites.map((favorite) => (
           <List.Item
             key={favorite.id}
@@ -212,8 +262,15 @@ export default function FavoritesCommand() {
             subtitle={favorite.query}
             icon={{ source: Icon.Star, tintColor: Color.Yellow }}
             accessories={[
-              favorite.useCount > 0 ? { text: `${favorite.useCount} uses`, tooltip: "Times used" } : null,
-              favorite.lastUsed ? { text: formatTimestamp(favorite.lastUsed), tooltip: "Last used" } : null,
+              favorite.useCount > 0
+                ? { text: `${favorite.useCount} uses`, tooltip: "Times used" }
+                : null,
+              favorite.lastUsed
+                ? {
+                    text: formatTimestamp(favorite.lastUsed),
+                    tooltip: "Last used",
+                  }
+                : null,
             ].filter((a): a is NonNullable<typeof a> => a !== null)}
             actions={
               <ActionPanel>

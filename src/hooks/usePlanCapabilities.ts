@@ -13,14 +13,24 @@ export interface PlanCapabilities {
   isPremium: boolean;
 }
 
-const PREMIUM_PLANS = ["basic", "plus", "corp", "enterprise", "edu", "small_business"];
+const PREMIUM_PLANS = [
+  "basic",
+  "plus",
+  "corp",
+  "enterprise",
+  "edu",
+  "small_business",
+];
 
 export function usePlanCapabilities(): PlanCapabilities {
   const { apiKey } = getPreferenceValues<Preferences>();
 
-  const { data, isLoading } = useFetch<ApiInfo>(`https://api.shodan.io/api-info?key=${apiKey}`, {
-    keepPreviousData: true,
-  });
+  const { data, isLoading } = useFetch<ApiInfo>(
+    `https://api.shodan.io/api-info?key=${apiKey}`,
+    {
+      keepPreviousData: true,
+    },
+  );
 
   const plan = data?.plan?.toLowerCase() ?? "unknown";
   const isPremium = PREMIUM_PLANS.includes(plan);
@@ -41,7 +51,9 @@ export function getPlanUpgradeUrl(): string {
   return "https://account.shodan.io/billing";
 }
 
-export function getRequiredPlanForFeature(feature: "exploits" | "https" | "telnet" | "unlocked"): string {
+export function getRequiredPlanForFeature(
+  feature: "exploits" | "https" | "telnet" | "unlocked",
+): string {
   switch (feature) {
     case "exploits":
       return "Membership (Basic or higher)";

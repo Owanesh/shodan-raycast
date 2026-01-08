@@ -5,16 +5,19 @@ import { ApiInfo, Preferences } from "../api/types";
 export function useApiCredits() {
   const { apiKey } = getPreferenceValues<Preferences>();
 
-  const { data, isLoading, error, revalidate } = useFetch<ApiInfo>(`https://api.shodan.io/api-info?key=${apiKey}`, {
-    keepPreviousData: true,
-    onError: (err) => {
-      showToast({
-        style: Toast.Style.Failure,
-        title: "Failed to fetch API credits",
-        message: err.message,
-      });
+  const { data, isLoading, error, revalidate } = useFetch<ApiInfo>(
+    `https://api.shodan.io/api-info?key=${apiKey}`,
+    {
+      keepPreviousData: true,
+      onError: (err) => {
+        showToast({
+          style: Toast.Style.Failure,
+          title: "Failed to fetch API credits",
+          message: err.message,
+        });
+      },
     },
-  });
+  );
 
   return {
     queryCredits: data?.query_credits ?? 0,

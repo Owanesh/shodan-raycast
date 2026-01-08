@@ -7,10 +7,17 @@ import { FavoriteQuery } from "../api/types";
 const FAVORITES_KEY = "shodan_favorites";
 
 export function useFavorites() {
-  const [favorites, setFavorites] = useCachedState<FavoriteQuery[]>(FAVORITES_KEY, []);
+  const [favorites, setFavorites] = useCachedState<FavoriteQuery[]>(
+    FAVORITES_KEY,
+    [],
+  );
 
   const addFavorite = useCallback(
-    async (name: string, query: string, description?: string): Promise<void> => {
+    async (
+      name: string,
+      query: string,
+      description?: string,
+    ): Promise<void> => {
       // Check for duplicates
       if (favorites.some((f) => f.query === query)) {
         await showToast({
@@ -60,7 +67,9 @@ export function useFavorites() {
 
   const updateFavorite = useCallback(
     async (id: string, updates: Partial<FavoriteQuery>): Promise<void> => {
-      const updated = favorites.map((f) => (f.id === id ? { ...f, ...updates } : f));
+      const updated = favorites.map((f) =>
+        f.id === id ? { ...f, ...updates } : f,
+      );
       setFavorites(updated);
       await LocalStorage.setItem(FAVORITES_KEY, JSON.stringify(updated));
     },

@@ -1,15 +1,37 @@
 import { useState, useMemo } from "react";
-import { List, ActionPanel, Action, Icon, useNavigation, Color } from "@raycast/api";
+import {
+  List,
+  ActionPanel,
+  Action,
+  Icon,
+  useNavigation,
+  Color,
+} from "@raycast/api";
 import { useFavorites } from "./hooks/useFavorites";
 import { useShodanSearch } from "./hooks/useShodanSearch";
 import { HostDetailView } from "./components/HostDetailView";
-import { PRESET_QUERIES, getCategoryDisplayName, getPresetCategories } from "./data/presets";
+import {
+  PRESET_QUERIES,
+  getCategoryDisplayName,
+  getPresetCategories,
+} from "./data/presets";
 import { PresetQuery, PresetCategory } from "./api/types";
-import { getPortColor, getServiceNameForPort, truncateString, getRiskColor } from "./utils/formatters";
+import {
+  getPortColor,
+  getServiceNameForPort,
+  truncateString,
+  getRiskColor,
+} from "./utils/formatters";
 import { copyAsCSV, copyAsJSON } from "./utils/export";
 import { filterResults } from "./utils/filter";
 
-function PresetResultsView({ preset, onBack }: { preset: PresetQuery; onBack: () => void }) {
+function PresetResultsView({
+  preset,
+  onBack,
+}: {
+  preset: PresetQuery;
+  onBack: () => void;
+}) {
   const { push } = useNavigation();
   const { addFavorite } = useFavorites();
   const [filterQuery, setFilterQuery] = useState("");
@@ -51,7 +73,11 @@ function PresetResultsView({ preset, onBack }: { preset: PresetQuery; onBack: ()
           actions={
             <ActionPanel>
               <Action title="Go Back" icon={Icon.ArrowLeft} onAction={onBack} />
-              <Action title="Save to Favorites" icon={Icon.Star} onAction={handleSaveToFavorites} />
+              <Action
+                title="Save to Favorites"
+                icon={Icon.Star}
+                onAction={handleSaveToFavorites}
+              />
             </ActionPanel>
           }
         />
@@ -67,9 +93,12 @@ function PresetResultsView({ preset, onBack }: { preset: PresetQuery; onBack: ()
           }
         >
           {displayResults.map((result, index) => {
-            const vulnCount = result.vulns ? Object.keys(result.vulns).length : 0;
+            const vulnCount = result.vulns
+              ? Object.keys(result.vulns).length
+              : 0;
             const subtitle = [
-              result.product && `${result.product}${result.version ? ` ${result.version}` : ""}`,
+              result.product &&
+                `${result.product}${result.version ? ` ${result.version}` : ""}`,
               result.org,
             ]
               .filter(Boolean)
@@ -106,7 +135,14 @@ function PresetResultsView({ preset, onBack }: { preset: PresetQuery; onBack: ()
                     <Action
                       title="View Details"
                       icon={Icon.Eye}
-                      onAction={() => push(<HostDetailView ip={result.ip_str} searchMatch={result} />)}
+                      onAction={() =>
+                        push(
+                          <HostDetailView
+                            ip={result.ip_str}
+                            searchMatch={result}
+                          />,
+                        )
+                      }
                     />
                     <Action.CopyToClipboard
                       title="Copy IP"
@@ -119,13 +155,21 @@ function PresetResultsView({ preset, onBack }: { preset: PresetQuery; onBack: ()
                       onAction={handleSaveToFavorites}
                       shortcut={{ modifiers: ["cmd"], key: "s" }}
                     />
-                    <Action title="Go Back" icon={Icon.ArrowLeft} onAction={onBack} />
+                    <Action
+                      title="Go Back"
+                      icon={Icon.ArrowLeft}
+                      onAction={onBack}
+                    />
                     <Action
                       title="Export All as JSON"
                       icon={Icon.Download}
                       onAction={() => copyAsJSON(displayResults, "All results")}
                     />
-                    <Action title="Export All as Csv" icon={Icon.Download} onAction={() => copyAsCSV(displayResults)} />
+                    <Action
+                      title="Export All as Csv"
+                      icon={Icon.Download}
+                      onAction={() => copyAsCSV(displayResults)}
+                    />
                   </ActionPanel>
                 }
               />
@@ -138,12 +182,19 @@ function PresetResultsView({ preset, onBack }: { preset: PresetQuery; onBack: ()
 }
 
 export default function PresetsCommand() {
-  const [selectedPreset, setSelectedPreset] = useState<PresetQuery | null>(null);
+  const [selectedPreset, setSelectedPreset] = useState<PresetQuery | null>(
+    null,
+  );
   const { addFavorite } = useFavorites();
   const categories = getPresetCategories();
 
   if (selectedPreset) {
-    return <PresetResultsView preset={selectedPreset} onBack={() => setSelectedPreset(null)} />;
+    return (
+      <PresetResultsView
+        preset={selectedPreset}
+        onBack={() => setSelectedPreset(null)}
+      />
+    );
   }
 
   const getCategoryIcon = (category: PresetCategory): Icon => {
@@ -165,13 +216,20 @@ export default function PresetsCommand() {
       {categories.map((category) => {
         const presets = PRESET_QUERIES.filter((p) => p.category === category);
         return (
-          <List.Section key={category} title={getCategoryDisplayName(category)} subtitle={`${presets.length} queries`}>
+          <List.Section
+            key={category}
+            title={getCategoryDisplayName(category)}
+            subtitle={`${presets.length} queries`}
+          >
             {presets.map((preset) => (
               <List.Item
                 key={preset.id}
                 title={preset.name}
                 subtitle={preset.description}
-                icon={{ source: getCategoryIcon(category), tintColor: getRiskColor(preset.risk) }}
+                icon={{
+                  source: getCategoryIcon(category),
+                  tintColor: getRiskColor(preset.risk),
+                }}
                 accessories={[
                   {
                     tag: {
@@ -203,7 +261,13 @@ export default function PresetsCommand() {
                       <Action
                         title="Add to Favorites"
                         icon={{ source: Icon.Star, tintColor: Color.Yellow }}
-                        onAction={() => addFavorite(preset.name, preset.query, preset.description)}
+                        onAction={() =>
+                          addFavorite(
+                            preset.name,
+                            preset.query,
+                            preset.description,
+                          )
+                        }
                         shortcut={{ modifiers: ["cmd"], key: "s" }}
                       />
                     </ActionPanel.Section>

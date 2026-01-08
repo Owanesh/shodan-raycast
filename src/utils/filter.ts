@@ -7,7 +7,10 @@ interface ParsedFilter {
 }
 
 // Parse a search query into filters and free text
-export function parseFilterQuery(query: string): { filters: ParsedFilter[]; freeText: string } {
+export function parseFilterQuery(query: string): {
+  filters: ParsedFilter[];
+  freeText: string;
+} {
   const filters: ParsedFilter[] = [];
   let freeText = query;
 
@@ -29,7 +32,10 @@ export function parseFilterQuery(query: string): { filters: ParsedFilter[]; free
 }
 
 // Get a field value from a result for filtering
-function getFieldValue(result: ShodanSearchMatch, field: string): string | string[] | number | null {
+function getFieldValue(
+  result: ShodanSearchMatch,
+  field: string,
+): string | string[] | number | null {
   switch (field) {
     case "country":
     case "country_code":
@@ -60,7 +66,9 @@ function getFieldValue(result: ShodanSearchMatch, field: string): string | strin
       return result.ip_str;
     case "vuln":
     case "cve":
-      return result.vulns ? Object.keys(result.vulns).map((v) => v.toLowerCase()) : [];
+      return result.vulns
+        ? Object.keys(result.vulns).map((v) => v.toLowerCase())
+        : [];
     case "tag":
     case "tags":
       return result.tags?.map((t) => t.toLowerCase()) || [];
@@ -70,7 +78,10 @@ function getFieldValue(result: ShodanSearchMatch, field: string): string | strin
 }
 
 // Check if a single filter matches a result
-function matchesFilter(result: ShodanSearchMatch, filter: ParsedFilter): boolean {
+function matchesFilter(
+  result: ShodanSearchMatch,
+  filter: ParsedFilter,
+): boolean {
   const fieldValue = getFieldValue(result, filter.field);
 
   if (fieldValue === null) {
@@ -120,7 +131,10 @@ function matchesFreeText(result: ShodanSearchMatch, text: string): boolean {
 }
 
 // Main filter function - filters an array of results based on a query string
-export function filterResults(results: ShodanSearchMatch[], query: string): ShodanSearchMatch[] {
+export function filterResults(
+  results: ShodanSearchMatch[],
+  query: string,
+): ShodanSearchMatch[] {
   if (!query.trim()) {
     return results;
   }
@@ -129,7 +143,9 @@ export function filterResults(results: ShodanSearchMatch[], query: string): Shod
 
   return results.filter((result) => {
     // Check all filters
-    const allFiltersMatch = filters.every((filter) => matchesFilter(result, filter));
+    const allFiltersMatch = filters.every((filter) =>
+      matchesFilter(result, filter),
+    );
     if (!allFiltersMatch) return false;
 
     // Check free text
@@ -148,7 +164,8 @@ export function getFilterSuggestions(results: ShodanSearchMatch[]): string[] {
   const products = new Set<string>();
 
   results.forEach((r) => {
-    if (r.location.country_code) countries.add(r.location.country_code.toLowerCase());
+    if (r.location.country_code)
+      countries.add(r.location.country_code.toLowerCase());
     ports.add(r.port);
     if (r.org) orgs.add(r.org);
     if (r.product) products.add(r.product);

@@ -1,10 +1,22 @@
 import { useState, useCallback } from "react";
-import { List, ActionPanel, Action, Icon, useNavigation, Color } from "@raycast/api";
+import {
+  List,
+  ActionPanel,
+  Action,
+  Icon,
+  useNavigation,
+  Color,
+} from "@raycast/api";
 import { useShodanSearch } from "./hooks/useShodanSearch";
 import { useFavorites } from "./hooks/useFavorites";
 import { useApiCredits } from "./hooks/useApiCredits";
 import { HostDetailView } from "./components/HostDetailView";
-import { getPortColor, getServiceNameForPort, truncateString, formatCredits } from "./utils/formatters";
+import {
+  getPortColor,
+  getServiceNameForPort,
+  truncateString,
+  formatCredits,
+} from "./utils/formatters";
 import { copyAsCSV, copyAsJSON } from "./utils/export";
 
 export default function SearchCommand() {
@@ -48,13 +60,20 @@ export default function SearchCommand() {
             }
           }}
         >
-          <List.Dropdown.Item title={`Credits: ${formatCredits(queryCredits)}`} value="credits" />
+          <List.Dropdown.Item
+            title={`Credits: ${formatCredits(queryCredits)}`}
+            value="credits"
+          />
           <List.Dropdown.Item title="Press Enter to Search" value="search" />
         </List.Dropdown>
       }
       actions={
         <ActionPanel>
-          <Action title="Search" icon={Icon.MagnifyingGlass} onAction={() => handleSearch(searchQuery)} />
+          <Action
+            title="Search"
+            icon={Icon.MagnifyingGlass}
+            onAction={() => handleSearch(searchQuery)}
+          />
         </ActionPanel>
       }
     >
@@ -65,7 +84,11 @@ export default function SearchCommand() {
           icon={Icon.MagnifyingGlass}
           actions={
             <ActionPanel>
-              <Action title="Search" icon={Icon.MagnifyingGlass} onAction={() => handleSearch(searchQuery)} />
+              <Action
+                title="Search"
+                icon={Icon.MagnifyingGlass}
+                onAction={() => handleSearch(searchQuery)}
+              />
             </ActionPanel>
           }
         />
@@ -80,11 +103,17 @@ export default function SearchCommand() {
       )}
 
       {results.length > 0 && (
-        <List.Section title={`Results for "${submittedQuery}"`} subtitle={`${total.toLocaleString()} total matches`}>
+        <List.Section
+          title={`Results for "${submittedQuery}"`}
+          subtitle={`${total.toLocaleString()} total matches`}
+        >
           {results.map((result, index) => {
-            const vulnCount = result.vulns ? Object.keys(result.vulns).length : 0;
+            const vulnCount = result.vulns
+              ? Object.keys(result.vulns).length
+              : 0;
             const subtitle = [
-              result.product && `${result.product}${result.version ? ` ${result.version}` : ""}`,
+              result.product &&
+                `${result.product}${result.version ? ` ${result.version}` : ""}`,
               result.org,
             ]
               .filter(Boolean)
@@ -124,7 +153,14 @@ export default function SearchCommand() {
                       <Action
                         title="View Details"
                         icon={Icon.Eye}
-                        onAction={() => push(<HostDetailView ip={result.ip_str} searchMatch={result} />)}
+                        onAction={() =>
+                          push(
+                            <HostDetailView
+                              ip={result.ip_str}
+                              searchMatch={result}
+                            />,
+                          )
+                        }
                       />
                       <Action.OpenInBrowser
                         title="Open in Shodan"
@@ -142,7 +178,9 @@ export default function SearchCommand() {
                       <Action
                         title="Copy Result as JSON"
                         icon={Icon.Clipboard}
-                        onAction={() => copyAsJSON(result, `Host ${result.ip_str}`)}
+                        onAction={() =>
+                          copyAsJSON(result, `Host ${result.ip_str}`)
+                        }
                         shortcut={{ modifiers: ["cmd", "shift"], key: "c" }}
                       />
                     </ActionPanel.Section>

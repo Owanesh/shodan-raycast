@@ -44,13 +44,18 @@ export function exportToCSV(results: ShodanSearchMatch[]): string {
 
   const csvContent = [
     headers.join(","),
-    ...rows.map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(",")),
+    ...rows.map((row) =>
+      row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(","),
+    ),
   ].join("\n");
 
   return csvContent;
 }
 
-export async function copyAsJSON(data: unknown, itemName = "data"): Promise<void> {
+export async function copyAsJSON(
+  data: unknown,
+  itemName = "data",
+): Promise<void> {
   await Clipboard.copy(exportToJSON(data));
   await showToast({
     style: Toast.Style.Success,
@@ -69,11 +74,16 @@ export async function copyAsCSV(results: ShodanSearchMatch[]): Promise<void> {
   });
 }
 
-export async function copyHostAsJSON(host: ShodanHost | ShodanSearchMatch): Promise<void> {
+export async function copyHostAsJSON(
+  host: ShodanHost | ShodanSearchMatch,
+): Promise<void> {
   await copyAsJSON(host, `Host ${host.ip_str}`);
 }
 
-export async function copyToClipboardWithHUD(content: string, message: string): Promise<void> {
+export async function copyToClipboardWithHUD(
+  content: string,
+  message: string,
+): Promise<void> {
   await Clipboard.copy(content);
   await showHUD(message);
 }

@@ -1,8 +1,24 @@
-import { List, ActionPanel, Action, Icon, Color, getPreferenceValues, showToast, Toast } from "@raycast/api";
+import {
+  List,
+  ActionPanel,
+  Action,
+  Icon,
+  Color,
+  getPreferenceValues,
+  showToast,
+  Toast,
+} from "@raycast/api";
 import { useFetch } from "@raycast/utils";
 import { Preferences, ApiInfo, ShodanProfile } from "./api/types";
-import { formatCredits, getCreditColor, formatTimestamp } from "./utils/formatters";
-import { usePlanCapabilities, getPlanUpgradeUrl } from "./hooks/usePlanCapabilities";
+import {
+  formatCredits,
+  getCreditColor,
+  formatTimestamp,
+} from "./utils/formatters";
+import {
+  usePlanCapabilities,
+  getPlanUpgradeUrl,
+} from "./hooks/usePlanCapabilities";
 
 export default function AccountCommand() {
   const { apiKey } = getPreferenceValues<Preferences>();
@@ -26,17 +42,23 @@ export default function AccountCommand() {
     data: profile,
     isLoading: profileLoading,
     revalidate: revalidateProfile,
-  } = useFetch<ShodanProfile>(`https://api.shodan.io/account/profile?key=${apiKey}`, {
-    onError: () => {
-      // Profile endpoint may not be available for all plans, silently fail
+  } = useFetch<ShodanProfile>(
+    `https://api.shodan.io/account/profile?key=${apiKey}`,
+    {
+      onError: () => {
+        // Profile endpoint may not be available for all plans, silently fail
+      },
     },
-  });
+  );
 
-  const { data: myIp, isLoading: ipLoading } = useFetch<string>(`https://api.shodan.io/tools/myip?key=${apiKey}`, {
-    onError: () => {
-      // Silently fail
+  const { data: myIp, isLoading: ipLoading } = useFetch<string>(
+    `https://api.shodan.io/tools/myip?key=${apiKey}`,
+    {
+      onError: () => {
+        // Silently fail
+      },
     },
-  });
+  );
 
   const isLoading = apiLoading || profileLoading || ipLoading;
 
@@ -62,21 +84,26 @@ export default function AccountCommand() {
       <List.Section title="API Credits">
         <List.Item
           title="Query Credits"
-          subtitle={apiInfo ? formatCredits(apiInfo.query_credits) : "Loading..."}
+          subtitle={
+            apiInfo ? formatCredits(apiInfo.query_credits) : "Loading..."
+          }
           icon={{
             source: Icon.MagnifyingGlass,
-            tintColor: apiInfo ? getCreditColor(apiInfo.query_credits) : Color.SecondaryText,
+            tintColor: apiInfo
+              ? getCreditColor(apiInfo.query_credits)
+              : Color.SecondaryText,
           }}
           accessories={
             apiInfo
               ? [
-                {
-                  tag: {
-                    value: apiInfo.query_credits > 0 ? "Available" : "Exhausted",
-                    color: getCreditColor(apiInfo.query_credits),
+                  {
+                    tag: {
+                      value:
+                        apiInfo.query_credits > 0 ? "Available" : "Exhausted",
+                      color: getCreditColor(apiInfo.query_credits),
+                    },
                   },
-                },
-              ]
+                ]
               : []
           }
           actions={
@@ -87,30 +114,44 @@ export default function AccountCommand() {
                 onAction={revalidate}
                 shortcut={{ modifiers: ["cmd"], key: "r" }}
               />
-              <Action.OpenInBrowser title="Manage Credits" url="https://account.shodan.io/" />
+              <Action.OpenInBrowser
+                title="Manage Credits"
+                url="https://account.shodan.io/"
+              />
             </ActionPanel>
           }
         />
         <List.Item
           title="Scan Credits"
-          subtitle={apiInfo ? formatCredits(apiInfo.scan_credits) : "Loading..."}
-          icon={{ source: Icon.Eye, tintColor: apiInfo ? getCreditColor(apiInfo.scan_credits) : Color.SecondaryText }}
+          subtitle={
+            apiInfo ? formatCredits(apiInfo.scan_credits) : "Loading..."
+          }
+          icon={{
+            source: Icon.Eye,
+            tintColor: apiInfo
+              ? getCreditColor(apiInfo.scan_credits)
+              : Color.SecondaryText,
+          }}
           accessories={
             apiInfo
               ? [
-                {
-                  tag: {
-                    value: apiInfo.scan_credits > 0 ? "Available" : "None",
-                    color: getCreditColor(apiInfo.scan_credits),
+                  {
+                    tag: {
+                      value: apiInfo.scan_credits > 0 ? "Available" : "None",
+                      color: getCreditColor(apiInfo.scan_credits),
+                    },
                   },
-                },
-              ]
+                ]
               : []
           }
         />
         <List.Item
           title="Monitored IPs"
-          subtitle={apiInfo ? `${apiInfo.monitored_ips.toLocaleString()} IPs` : "Loading..."}
+          subtitle={
+            apiInfo
+              ? `${apiInfo.monitored_ips.toLocaleString()} IPs`
+              : "Loading..."
+          }
           icon={Icon.Bell}
         />
       </List.Section>
@@ -119,18 +160,35 @@ export default function AccountCommand() {
         <List.Item
           title="Current Plan"
           subtitle={apiInfo?.plan || "Loading..."}
-          icon={{ source: Icon.Star, tintColor: apiInfo ? getPlanColor(apiInfo.plan) : Color.SecondaryText }}
+          icon={{
+            source: Icon.Star,
+            tintColor: apiInfo
+              ? getPlanColor(apiInfo.plan)
+              : Color.SecondaryText,
+          }}
           accessories={
             apiInfo
               ? [
-                  { tag: { value: apiInfo.plan.toUpperCase(), color: getPlanColor(apiInfo.plan) } },
-                  !isPremium ? { tag: { value: "Free Tier", color: Color.SecondaryText } } : null,
+                  {
+                    tag: {
+                      value: apiInfo.plan.toUpperCase(),
+                      color: getPlanColor(apiInfo.plan),
+                    },
+                  },
+                  !isPremium
+                    ? {
+                        tag: { value: "Free Tier", color: Color.SecondaryText },
+                      }
+                    : null,
                 ].filter((a): a is NonNullable<typeof a> => a !== null)
               : []
           }
           actions={
             <ActionPanel>
-              <Action.OpenInBrowser title="Upgrade Plan" url={getPlanUpgradeUrl()} />
+              <Action.OpenInBrowser
+                title="Upgrade Plan"
+                url={getPlanUpgradeUrl()}
+              />
             </ActionPanel>
           }
         />
@@ -139,7 +197,10 @@ export default function AccountCommand() {
             <List.Item
               title="HTTPS Filter"
               subtitle={apiInfo.https ? "Enabled" : "Requires Membership"}
-              icon={{ source: Icon.Lock, tintColor: apiInfo.https ? Color.Green : Color.Orange }}
+              icon={{
+                source: Icon.Lock,
+                tintColor: apiInfo.https ? Color.Green : Color.Orange,
+              }}
               accessories={[
                 apiInfo.https
                   ? { tag: { value: "Available", color: Color.Green } }
@@ -148,7 +209,10 @@ export default function AccountCommand() {
               actions={
                 !apiInfo.https ? (
                   <ActionPanel>
-                    <Action.OpenInBrowser title="Upgrade to Enable" url={getPlanUpgradeUrl()} />
+                    <Action.OpenInBrowser
+                      title="Upgrade to Enable"
+                      url={getPlanUpgradeUrl()}
+                    />
                   </ActionPanel>
                 ) : undefined
               }
@@ -156,7 +220,10 @@ export default function AccountCommand() {
             <List.Item
               title="Telnet Filter"
               subtitle={apiInfo.telnet ? "Enabled" : "Requires Membership"}
-              icon={{ source: Icon.Terminal, tintColor: apiInfo.telnet ? Color.Green : Color.Orange }}
+              icon={{
+                source: Icon.Terminal,
+                tintColor: apiInfo.telnet ? Color.Green : Color.Orange,
+              }}
               accessories={[
                 apiInfo.telnet
                   ? { tag: { value: "Available", color: Color.Green } }
@@ -165,7 +232,10 @@ export default function AccountCommand() {
               actions={
                 !apiInfo.telnet ? (
                   <ActionPanel>
-                    <Action.OpenInBrowser title="Upgrade to Enable" url={getPlanUpgradeUrl()} />
+                    <Action.OpenInBrowser
+                      title="Upgrade to Enable"
+                      url={getPlanUpgradeUrl()}
+                    />
                   </ActionPanel>
                 ) : undefined
               }
@@ -173,7 +243,10 @@ export default function AccountCommand() {
             <List.Item
               title="Exploits API"
               subtitle={canAccessExploits ? "Enabled" : "Requires Membership"}
-              icon={{ source: Icon.Bug, tintColor: canAccessExploits ? Color.Green : Color.Orange }}
+              icon={{
+                source: Icon.Bug,
+                tintColor: canAccessExploits ? Color.Green : Color.Orange,
+              }}
               accessories={[
                 canAccessExploits
                   ? { tag: { value: "Available", color: Color.Green } }
@@ -182,15 +255,25 @@ export default function AccountCommand() {
               actions={
                 !canAccessExploits ? (
                   <ActionPanel>
-                    <Action.OpenInBrowser title="Upgrade to Enable" url={getPlanUpgradeUrl()} />
+                    <Action.OpenInBrowser
+                      title="Upgrade to Enable"
+                      url={getPlanUpgradeUrl()}
+                    />
                   </ActionPanel>
                 ) : undefined
               }
             />
             <List.Item
               title="Unlocked Results"
-              subtitle={apiInfo.unlocked ? `${apiInfo.unlocked_left} remaining` : "Requires Membership"}
-              icon={{ source: Icon.LockUnlocked, tintColor: apiInfo.unlocked ? Color.Green : Color.Orange }}
+              subtitle={
+                apiInfo.unlocked
+                  ? `${apiInfo.unlocked_left} remaining`
+                  : "Requires Membership"
+              }
+              icon={{
+                source: Icon.LockUnlocked,
+                tintColor: apiInfo.unlocked ? Color.Green : Color.Orange,
+              }}
               accessories={[
                 apiInfo.unlocked
                   ? { tag: { value: "Available", color: Color.Green } }
@@ -199,7 +282,10 @@ export default function AccountCommand() {
               actions={
                 !apiInfo.unlocked ? (
                   <ActionPanel>
-                    <Action.OpenInBrowser title="Upgrade to Enable" url={getPlanUpgradeUrl()} />
+                    <Action.OpenInBrowser
+                      title="Upgrade to Enable"
+                      url={getPlanUpgradeUrl()}
+                    />
                   </ActionPanel>
                 ) : undefined
               }
@@ -210,12 +296,23 @@ export default function AccountCommand() {
 
       {profile && (
         <List.Section title="Profile">
-          <List.Item title="Display Name" subtitle={profile.display_name || "Not set"} icon={Icon.Person} />
-          <List.Item title="Member Since" subtitle={formatTimestamp(profile.created)} icon={Icon.Calendar} />
+          <List.Item
+            title="Display Name"
+            subtitle={profile.display_name || "Not set"}
+            icon={Icon.Person}
+          />
+          <List.Item
+            title="Member Since"
+            subtitle={formatTimestamp(profile.created)}
+            icon={Icon.Calendar}
+          />
           <List.Item
             title="Membership"
             subtitle={profile.member ? "Active Member" : "Free Account"}
-            icon={{ source: Icon.Checkmark, tintColor: profile.member ? Color.Green : Color.SecondaryText }}
+            icon={{
+              source: Icon.Checkmark,
+              tintColor: profile.member ? Color.Green : Color.SecondaryText,
+            }}
           />
         </List.Section>
       )}
@@ -228,7 +325,10 @@ export default function AccountCommand() {
             icon={Icon.Globe}
             actions={
               <ActionPanel>
-                <Action.CopyToClipboard title="Copy IP" content={typeof myIp === "string" ? myIp : String(myIp)} />
+                <Action.CopyToClipboard
+                  title="Copy IP"
+                  content={typeof myIp === "string" ? myIp : String(myIp)}
+                />
                 <Action.OpenInBrowser
                   title="View on Shodan"
                   url={`https://www.shodan.io/host/${typeof myIp === "string" ? myIp : String(myIp)}`}
@@ -246,7 +346,10 @@ export default function AccountCommand() {
           icon={Icon.Globe}
           actions={
             <ActionPanel>
-              <Action.OpenInBrowser title="Open Dashboard" url="https://www.shodan.io/dashboard" />
+              <Action.OpenInBrowser
+                title="Open Dashboard"
+                url="https://www.shodan.io/dashboard"
+              />
             </ActionPanel>
           }
         />
@@ -256,7 +359,10 @@ export default function AccountCommand() {
           icon={Icon.Gear}
           actions={
             <ActionPanel>
-              <Action.OpenInBrowser title="Open Settings" url="https://account.shodan.io/" />
+              <Action.OpenInBrowser
+                title="Open Settings"
+                url="https://account.shodan.io/"
+              />
             </ActionPanel>
           }
         />
@@ -266,7 +372,10 @@ export default function AccountCommand() {
           icon={Icon.Document}
           actions={
             <ActionPanel>
-              <Action.OpenInBrowser title="Open Docs" url="https://developer.shodan.io/api" />
+              <Action.OpenInBrowser
+                title="Open Docs"
+                url="https://developer.shodan.io/api"
+              />
             </ActionPanel>
           }
         />

@@ -1,5 +1,13 @@
 import { useState } from "react";
-import { List, ActionPanel, Action, Icon, Form, useNavigation, LaunchProps } from "@raycast/api";
+import {
+  List,
+  ActionPanel,
+  Action,
+  Icon,
+  Form,
+  useNavigation,
+  LaunchProps,
+} from "@raycast/api";
 import { useShodanHost } from "./hooks/useShodanHost";
 import { HostDetailView } from "./components/HostDetailView";
 import { copyHostAsJSON } from "./utils/export";
@@ -10,7 +18,9 @@ interface HostLookupArguments {
   ip?: string;
 }
 
-export default function HostLookupCommand(props: LaunchProps<{ arguments: HostLookupArguments }>) {
+export default function HostLookupCommand(
+  props: LaunchProps<{ arguments: HostLookupArguments }>,
+) {
   const initialIp = props.arguments?.ip || "";
   const [ipInput, setIpInput] = useState(initialIp);
   const [submittedIp, setSubmittedIp] = useState(initialIp);
@@ -35,7 +45,11 @@ export default function HostLookupCommand(props: LaunchProps<{ arguments: HostLo
         navigationTitle="Host Lookup"
         actions={
           <ActionPanel>
-            <Action.SubmitForm title="Look up Host" onSubmit={() => handleSubmit()} icon={Icon.MagnifyingGlass} />
+            <Action.SubmitForm
+              title="Look up Host"
+              onSubmit={() => handleSubmit()}
+              icon={Icon.MagnifyingGlass}
+            />
           </ActionPanel>
         }
       >
@@ -56,7 +70,10 @@ export default function HostLookupCommand(props: LaunchProps<{ arguments: HostLo
   if (isLoading) {
     return (
       <List isLoading={true} navigationTitle={`Looking up ${submittedIp}`}>
-        <List.EmptyView title="Loading..." description={`Fetching information for ${submittedIp}`} />
+        <List.EmptyView
+          title="Loading..."
+          description={`Fetching information for ${submittedIp}`}
+        />
       </List>
     );
   }
@@ -129,7 +146,10 @@ export default function HostLookupCommand(props: LaunchProps<{ arguments: HostLo
           icon={Icon.Building}
           actions={
             <ActionPanel>
-              <Action.CopyToClipboard title="Copy Organization" content={host.org} />
+              <Action.CopyToClipboard
+                title="Copy Organization"
+                content={host.org}
+              />
             </ActionPanel>
           }
         />
@@ -144,7 +164,13 @@ export default function HostLookupCommand(props: LaunchProps<{ arguments: HostLo
           }
         />
         <List.Item title="ISP" subtitle={host.isp} icon={Icon.Wifi} />
-        {host.os && <List.Item title="Operating System" subtitle={host.os} icon={Icon.Desktop} />}
+        {host.os && (
+          <List.Item
+            title="Operating System"
+            subtitle={host.os}
+            icon={Icon.Desktop}
+          />
+        )}
       </List.Section>
 
       <List.Section title="Location">
@@ -153,7 +179,13 @@ export default function HostLookupCommand(props: LaunchProps<{ arguments: HostLo
           subtitle={`${host.location.country_name} (${host.location.country_code})`}
           icon={Icon.Pin}
         />
-        {host.location.city && <List.Item title="City" subtitle={host.location.city} icon={Icon.Map} />}
+        {host.location.city && (
+          <List.Item
+            title="City"
+            subtitle={host.location.city}
+            icon={Icon.Map}
+          />
+        )}
         <List.Item
           title="Coordinates"
           subtitle={`${host.location.latitude}, ${host.location.longitude}`}
@@ -188,7 +220,10 @@ export default function HostLookupCommand(props: LaunchProps<{ arguments: HostLo
             icon={Icon.Ellipsis}
             actions={
               <ActionPanel>
-                <Action.CopyToClipboard title="Copy All Ports" content={host.ports.join(", ")} />
+                <Action.CopyToClipboard
+                  title="Copy All Ports"
+                  content={host.ports.join(", ")}
+                />
               </ActionPanel>
             }
           />
@@ -204,7 +239,10 @@ export default function HostLookupCommand(props: LaunchProps<{ arguments: HostLo
               icon={{ source: Icon.Bug, tintColor: Color.Red }}
               actions={
                 <ActionPanel>
-                  <Action.OpenInBrowser title="View Cve Details" url={`https://nvd.nist.gov/vuln/detail/${vuln}`} />
+                  <Action.OpenInBrowser
+                    title="View Cve Details"
+                    url={`https://nvd.nist.gov/vuln/detail/${vuln}`}
+                  />
                   <Action.CopyToClipboard title="Copy Cve" content={vuln} />
                 </ActionPanel>
               }
@@ -222,8 +260,14 @@ export default function HostLookupCommand(props: LaunchProps<{ arguments: HostLo
               icon={Icon.Link}
               actions={
                 <ActionPanel>
-                  <Action.CopyToClipboard title="Copy Hostname" content={hostname} />
-                  <Action.OpenInBrowser title="Open in Browser" url={`http://${hostname}`} />
+                  <Action.CopyToClipboard
+                    title="Copy Hostname"
+                    content={hostname}
+                  />
+                  <Action.OpenInBrowser
+                    title="Open in Browser"
+                    url={`http://${hostname}`}
+                  />
                 </ActionPanel>
               }
             />
@@ -238,7 +282,11 @@ export default function HostLookupCommand(props: LaunchProps<{ arguments: HostLo
           icon={Icon.Download}
           actions={
             <ActionPanel>
-              <Action title="Copy as JSON" icon={Icon.Clipboard} onAction={() => copyHostAsJSON(host)} />
+              <Action
+                title="Copy as JSON"
+                icon={Icon.Clipboard}
+                onAction={() => copyHostAsJSON(host)}
+              />
             </ActionPanel>
           }
         />
@@ -248,7 +296,10 @@ export default function HostLookupCommand(props: LaunchProps<{ arguments: HostLo
           icon={Icon.Globe}
           actions={
             <ActionPanel>
-              <Action.OpenInBrowser title="Open in Shodan" url={`https://www.shodan.io/host/${host.ip_str}`} />
+              <Action.OpenInBrowser
+                title="Open in Shodan"
+                url={`https://www.shodan.io/host/${host.ip_str}`}
+              />
             </ActionPanel>
           }
         />

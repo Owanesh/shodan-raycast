@@ -32,10 +32,15 @@ class ShodanClient {
     return preferences.apiKey;
   }
 
-  private async request<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
+  private async request<T>(
+    endpoint: string,
+    options: RequestOptions = {},
+  ): Promise<T> {
     const { method = "GET", body } = options;
 
-    const url = new URL(endpoint.startsWith("http") ? endpoint : `${SHODAN_API_BASE}${endpoint}`);
+    const url = new URL(
+      endpoint.startsWith("http") ? endpoint : `${SHODAN_API_BASE}${endpoint}`,
+    );
     url.searchParams.set("key", this.apiKey);
 
     const fetchOptions: RequestInit = {
@@ -76,7 +81,11 @@ class ShodanClient {
 
   async getCredits(forceRefresh = false): Promise<ApiCredits> {
     const now = Date.now();
-    if (!forceRefresh && this.cachedCredits && now - this.lastCreditsCheck < this.CREDITS_CACHE_TTL) {
+    if (
+      !forceRefresh &&
+      this.cachedCredits &&
+      now - this.lastCreditsCheck < this.CREDITS_CACHE_TTL
+    ) {
       return this.cachedCredits;
     }
 
@@ -106,13 +115,21 @@ class ShodanClient {
     return this.request<ShodanSearchResponse>(url);
   }
 
-  async searchCount(query: string): Promise<{ total: number; facets: Record<string, unknown> }> {
+  async searchCount(
+    query: string,
+  ): Promise<{ total: number; facets: Record<string, unknown> }> {
     const url = `/shodan/host/count?query=${encodeURIComponent(query)}`;
-    return this.request<{ total: number; facets: Record<string, unknown> }>(url);
+    return this.request<{ total: number; facets: Record<string, unknown> }>(
+      url,
+    );
   }
 
   // Host
-  async hostLookup(ip: string, history = false, minify = false): Promise<ShodanHost> {
+  async hostLookup(
+    ip: string,
+    history = false,
+    minify = false,
+  ): Promise<ShodanHost> {
     let url = `/shodan/host/${ip}`;
     const params = new URLSearchParams();
     if (history) params.set("history", "true");
@@ -137,7 +154,10 @@ class ShodanClient {
   }
 
   // Exploits
-  async searchExploits(query: string, page = 1): Promise<ShodanExploitResponse> {
+  async searchExploits(
+    query: string,
+    page = 1,
+  ): Promise<ShodanExploitResponse> {
     const url = `${EXPLOITS_API_BASE}/search?query=${encodeURIComponent(query)}&page=${page}&key=${this.apiKey}`;
     return this.request<ShodanExploitResponse>(url);
   }
@@ -156,7 +176,11 @@ class ShodanClient {
     return this.request<ShodanAlert>(`/shodan/alert/${id}/info`);
   }
 
-  async createAlert(name: string, ips: string[], expires?: number): Promise<ShodanAlert> {
+  async createAlert(
+    name: string,
+    ips: string[],
+    expires?: number,
+  ): Promise<ShodanAlert> {
     return this.request<ShodanAlert>("/shodan/alert", {
       method: "POST",
       body: { name, filters: { ip: ips }, expires },

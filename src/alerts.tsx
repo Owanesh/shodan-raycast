@@ -17,7 +17,7 @@ import { useFetch } from "@raycast/utils";
 import { Preferences, ShodanAlert } from "./api/types";
 import { formatTimestamp } from "./utils/formatters";
 import { shodanClient } from "./api/client";
-import { usePlanCapabilities, getPlanUpgradeUrl } from "./hooks/usePlanCapabilities";
+import { usePlanCapabilities } from "./hooks/usePlanCapabilities";
 import { PremiumFeatureNotice } from "./components/PremiumFeatureNotice";
 
 function CreateAlertForm({ onSuccess }: { onSuccess: () => void }) {
@@ -32,19 +32,29 @@ function CreateAlertForm({ onSuccess }: { onSuccess: () => void }) {
       .filter((ip) => ip.length > 0);
 
     if (!name) {
-      await showToast({ style: Toast.Style.Failure, title: "Name is required" });
+      await showToast({
+        style: Toast.Style.Failure,
+        title: "Name is required",
+      });
       return;
     }
 
     if (ips.length === 0) {
-      await showToast({ style: Toast.Style.Failure, title: "At least one IP is required" });
+      await showToast({
+        style: Toast.Style.Failure,
+        title: "At least one IP is required",
+      });
       return;
     }
 
     setIsLoading(true);
     try {
       await shodanClient.createAlert(name, ips);
-      await showToast({ style: Toast.Style.Success, title: "Alert Created", message: name });
+      await showToast({
+        style: Toast.Style.Success,
+        title: "Alert Created",
+        message: name,
+      });
       onSuccess();
       pop();
     } catch (error) {
@@ -64,11 +74,20 @@ function CreateAlertForm({ onSuccess }: { onSuccess: () => void }) {
       navigationTitle="Create Network Alert"
       actions={
         <ActionPanel>
-          <Action.SubmitForm title="Create Alert" onSubmit={handleSubmit} icon={Icon.Plus} />
+          <Action.SubmitForm
+            title="Create Alert"
+            onSubmit={handleSubmit}
+            icon={Icon.Plus}
+          />
         </ActionPanel>
       }
     >
-      <Form.TextField id="name" title="Alert Name" placeholder="My Network Monitor" autoFocus />
+      <Form.TextField
+        id="name"
+        title="Alert Name"
+        placeholder="My Network Monitor"
+        autoFocus
+      />
       <Form.TextArea
         id="ips"
         title="IP Addresses"
@@ -89,20 +108,25 @@ export default function AlertsCommand() {
     data: alerts,
     isLoading,
     revalidate,
-  } = useFetch<ShodanAlert[]>(`https://api.shodan.io/shodan/alert/info?key=${apiKey}`, {
-    onError: (err) => {
-      let message = err.message;
-      if (message.includes("401") || message.includes("403")) {
-        setAccessError("Your plan may not have access to Network Alerts. Upgrade to a Membership for full access.");
-        message = "Access denied - Membership may be required";
-      }
-      showToast({
-        style: Toast.Style.Failure,
-        title: "Failed to Load Alerts",
-        message,
-      });
+  } = useFetch<ShodanAlert[]>(
+    `https://api.shodan.io/shodan/alert/info?key=${apiKey}`,
+    {
+      onError: (err) => {
+        let message = err.message;
+        if (message.includes("401") || message.includes("403")) {
+          setAccessError(
+            "Your plan may not have access to Network Alerts. Upgrade to a Membership for full access.",
+          );
+          message = "Access denied - Membership may be required";
+        }
+        showToast({
+          style: Toast.Style.Failure,
+          title: "Failed to Load Alerts",
+          message,
+        });
+      },
     },
-  });
+  );
 
   const handleDelete = async (alert: ShodanAlert) => {
     const confirmed = await confirmAlert({
@@ -152,8 +176,16 @@ export default function AlertsCommand() {
       searchBarPlaceholder="Search alerts..."
       actions={
         <ActionPanel>
-          <Action title="Create Alert" icon={Icon.Plus} onAction={handleCreate} />
-          <Action title="Refresh" icon={Icon.ArrowClockwise} onAction={() => revalidate()} />
+          <Action
+            title="Create Alert"
+            icon={Icon.Plus}
+            onAction={handleCreate}
+          />
+          <Action
+            title="Refresh"
+            icon={Icon.ArrowClockwise}
+            onAction={() => revalidate()}
+          />
         </ActionPanel>
       }
     >
@@ -164,17 +196,26 @@ export default function AlertsCommand() {
           icon={Icon.Bell}
           actions={
             <ActionPanel>
-              <Action title="Create Alert" icon={Icon.Plus} onAction={handleCreate} />
+              <Action
+                title="Create Alert"
+                icon={Icon.Plus}
+                onAction={handleCreate}
+              />
             </ActionPanel>
           }
         />
       )}
 
       {alerts && alerts.length > 0 && (
-        <List.Section title="Network Alerts" subtitle={`${alerts.length} alert${alerts.length !== 1 ? "s" : ""}`}>
+        <List.Section
+          title="Network Alerts"
+          subtitle={`${alerts.length} alert${alerts.length !== 1 ? "s" : ""}`}
+        >
           {alerts.map((alert) => {
             const ipCount = alert.filters.ip.length;
-            const isExpired = alert.expires ? Date.now() / 1000 > alert.expires : false;
+            const isExpired = alert.expires
+              ? Date.now() / 1000 > alert.expires
+              : false;
 
             return (
               <List.Item
@@ -194,12 +235,21 @@ export default function AlertsCommand() {
                 actions={
                   <ActionPanel>
                     <ActionPanel.Section title="View">
-                      <Action.OpenInBrowser title="View on Shodan" url={`https://monitor.shodan.io/dashboard`} />
+                      <Action.OpenInBrowser
+                        title="View on Shodan"
+                        url={`https://monitor.shodan.io/dashboard`}
+                      />
                     </ActionPanel.Section>
 
                     <ActionPanel.Section title="Copy">
-                      <Action.CopyToClipboard title="Copy IP Addresses" content={alert.filters.ip.join(", ")} />
-                      <Action.CopyToClipboard title="Copy Alert ID" content={alert.id} />
+                      <Action.CopyToClipboard
+                        title="Copy IP Addresses"
+                        content={alert.filters.ip.join(", ")}
+                      />
+                      <Action.CopyToClipboard
+                        title="Copy Alert ID"
+                        content={alert.id}
+                      />
                     </ActionPanel.Section>
 
                     <ActionPanel.Section title="Manage">
@@ -210,7 +260,11 @@ export default function AlertsCommand() {
                         onAction={() => handleDelete(alert)}
                         shortcut={{ modifiers: ["cmd"], key: "backspace" }}
                       />
-                      <Action title="Create New Alert" icon={Icon.Plus} onAction={handleCreate} />
+                      <Action
+                        title="Create New Alert"
+                        icon={Icon.Plus}
+                        onAction={handleCreate}
+                      />
                       <Action
                         title="Refresh"
                         icon={Icon.ArrowClockwise}

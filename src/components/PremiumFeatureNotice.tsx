@@ -8,7 +8,12 @@ interface PremiumFeatureNoticeProps {
   description?: string;
 }
 
-export function PremiumFeatureNotice({ feature, requiredPlan, currentPlan, description }: PremiumFeatureNoticeProps) {
+export function PremiumFeatureNotice({
+  feature,
+  requiredPlan,
+  currentPlan,
+  description,
+}: PremiumFeatureNoticeProps) {
   return (
     <List.EmptyView
       title={`${feature} Requires Upgrade`}
@@ -19,8 +24,15 @@ export function PremiumFeatureNotice({ feature, requiredPlan, currentPlan, descr
       icon={{ source: Icon.Lock, tintColor: Color.Orange }}
       actions={
         <ActionPanel>
-          <Action.OpenInBrowser title="Upgrade Plan" url={getPlanUpgradeUrl()} icon={Icon.ArrowUpCircle} />
-          <Action.OpenInBrowser title="View Shodan Plans" url="https://account.shodan.io/billing" />
+          <Action.OpenInBrowser
+            title="Upgrade Plan"
+            url={getPlanUpgradeUrl()}
+            icon={Icon.ArrowUpCircle}
+          />
+          <Action.OpenInBrowser
+            title="View Shodan Plans"
+            url="https://account.shodan.io/billing"
+          />
         </ActionPanel>
       }
     />
