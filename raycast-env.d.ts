@@ -34,6 +34,8 @@ declare namespace Preferences {
   export type Alerts = ExtensionPreferences & {}
   /** Preferences accessible in the `account` command */
   export type Account = ExtensionPreferences & {}
+  /** Preferences accessible in the `history` command */
+  export type History = ExtensionPreferences & {}
 }
 
 declare namespace Arguments {
@@ -56,5 +58,7 @@ declare namespace Arguments {
   export type Alerts = {}
   /** Arguments passed to the `account` command */
   export type Account = {}
+  /** Arguments passed to the `history` command */
+  export type History = {}
 }
 
